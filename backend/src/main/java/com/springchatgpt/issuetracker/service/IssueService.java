@@ -35,53 +35,116 @@ public class IssueService {
         this.userService = userService;
     }
 
-   public IssueResponseDTO createIssue(
+    public IssueResponseDTO createIssue(
         IssueRequestDTO request,
         Long projectId,
         Long userId) {
 
-    log.info("Creating issue for projectId={}, userId={}, title={}", projectId, userId, request.getTitle());
-    Project project = projectService.getById(projectId);
-    User user = userService.getUserById(userId);
+        log.info("Creating issue for projectId={}, userId={}, title={}", projectId, userId, request.getTitle());
+        Project project = projectService.getById(projectId);
+        User user = userId != null ? userService.getUserById(userId) : null;
 
-    // DTO → Entity
-    Issue issue = new Issue();
-    issue.setTitle(request.getTitle());
-    issue.setProject(project);
-    issue.setAssignee(user);
+        Issue issue = new Issue();
+        issue.setTitle(request.getTitle());
+        issue.setDescription(request.getDescription());
+        issue.setStatus(request.getStatus() != null ? request.getStatus() : "OPEN");
+        issue.setProject(project);
+        issue.setAssignee(user);
 
-    Issue saved = issueRepository.save(issue);
-    log.debug("Saved issue with id={}", saved.getId());
+        Issue saved = issueRepository.save(issue);
+        log.debug("Saved issue with id={}", saved.getId());
 
-    // Entity → DTO
-    IssueResponseDTO response = new IssueResponseDTO();
-    response.setId(saved.getId());
-    response.setProjectId(project.getId());
-    response.setProjectName(project.getName());
-    response.setAssigneeId(user.getId());
-    response.setAssigneeName(user.getName());
-    log.info("Returning IssueResponseDTO for issue id={}", saved.getId());
-    return response;
-}
-
-    public List<Issue> getAllIssues(){
-        return issueRepository.findAll();
+        log.info("Returning IssueResponseDTO for issue id={}", saved.getId());
+        return toResponse(saved);
     }
 
-    public List<Issue> getIssuesByProject(Long id){
-        return issueRepository.findByProjectId(id);
+    public List<IssueResponseDTO> getAllIssues(){
+        return issueRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public List<Issue> getIssuesByUser(Long id){
-        return issueRepository.findByAssigneeId(id);
+    public List<IssueResponseDTO> getIssuesByProject(Long id){
+        return issueRepository.findByProjectId(id)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public Page<Issue> getPagedIssues(int page, int size){
+    public List<IssueResponseDTO> getIssuesByUser(Long id){
+        return issueRepository.findByAssigneeId(id)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public Page<IssueResponseDTO> getPagedIssues(int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by("title"));
-        return issueRepository.findAll(pageable);
+        return issueRepository.findAll(pageable)
+                .map(this::toResponse);
     }
 
-    public List<Issue> searchIssues(String keyword) {
-        return issueRepository.searchByTitle(keyword);
+    public List<IssueResponseDTO> searchIssues(String keyword) {
+        return issueRepository.searchByTitle(keyword)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public IssueResponseDTO updateIssue(Long id, IssueRequestDTO request) {
+        Issue issue = issueRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Issue not found"));
+
+        if (request.getTitle() != null && !request.getTitle().isBlank()) {
+            issue.setTitle(request.getTitle());
+        }
+        if (request.getDescription() != null) {
+            issue.setDescription(request.getDescription());
+        }
+        if (request.getStatus() != null && !request.getStatus().isBlank()) {
+            issue.setStatus(request.getStatus());
+        }
+
+        if (request.getProjectId() != null) {
+            Project project = projectService.getById(request.getProjectId());
+            issue.setProject(project);
+        }
+
+        if (request.getUserId() != null) {
+            User user = userService.getUserById(request.getUserId());
+            issue.setAssignee(user);
+        }
+
+        Issue saved = issueRepository.save(issue);
+        return toResponse(saved);
+    }
+
+    public void deleteIssue(Long id) {
+        Issue issue = issueRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Issue not found"));
+        issueRepository.delete(issue);
+    }
+
+    private IssueResponseDTO toResponse(Issue issue) {
+        IssueResponseDTO response = new IssueResponseDTO();
+        response.setId(issue.getId());
+        response.setTitle(issue.getTitle());
+        response.setDescription(issue.getDescription());
+        response.setStatus(issue.getStatus() != null ? issue.getStatus() : "OPEN");
+
+        Project project = issue.getProject();
+        if (project != null) {
+            response.setProjectId(project.getId());
+            response.setProjectName(project.getName());
+        }
+
+        User assignee = issue.getAssignee();
+        if (assignee != null) {
+            response.setAssigneeId(assignee.getId());
+            response.setAssigneeName(assignee.getName());
+        }
+
+        return response;
     }
 }

@@ -1,18 +1,16 @@
 package com.springchatgpt.issuetracker.controller;
 
-
 import com.springchatgpt.issuetracker.dto.IssueRequestDTO;
 import com.springchatgpt.issuetracker.dto.IssueResponseDTO;
-import com.springchatgpt.issuetracker.entity.Issue;
 import com.springchatgpt.issuetracker.service.IssueService;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/issues")
 public class IssueController {
 
     private final IssueService service;
@@ -21,45 +19,87 @@ public class IssueController {
         this.service = service;
     }
 
-    @PostMapping
-    public IssueResponseDTO createIssue(
-            @RequestParam Long projectId,
-            @RequestParam Long userId,
+    // CREATE ISSUE
+    @PostMapping("/projects/{projectId}/issues")
+    public ResponseEntity<IssueResponseDTO> createIssue(
+            @PathVariable Long projectId,
+            @RequestParam(required = false) Long userId,
             @RequestBody IssueRequestDTO issue){
 
-        return service.createIssue(
-                issue,
-                projectId,
-                userId);
+        Long resolvedUserId = userId != null ? userId : issue.getUserId();
+
+        IssueResponseDTO created =
+                service.createIssue(issue, projectId, resolvedUserId);
+
+        return ResponseEntity
+                .status(201)
+                .body(created);
     }
 
-    @GetMapping
-    public List<Issue> getAll(){
+    // GET ISSUES BY PROJECT
+    @GetMapping("/projects/{projectId}/issues")
+    public ResponseEntity<List<IssueResponseDTO>> getByProject(
+            @PathVariable Long projectId){
 
-        return service.getAllIssues();
+        return ResponseEntity.ok(
+                service.getIssuesByProject(projectId)
+        );
     }
 
-    @GetMapping("/project/{id}")
-    public List<Issue> getByProject(
-            @PathVariable Long id){
+    // GET ALL ISSUES
+    @GetMapping("/issues")
+    public ResponseEntity<List<IssueResponseDTO>> getAll(){
 
-        return service.getIssuesByProject(id);
+        return ResponseEntity.ok(
+                service.getAllIssues()
+        );
     }
 
-    @GetMapping("/user/{id}")
-    public List<Issue> getByUser(
-            @PathVariable Long id){
+    // UPDATE ISSUE
+    @PutMapping("/issues/{id}")
+    public ResponseEntity<IssueResponseDTO> updateIssue(
+            @PathVariable Long id,
+            @RequestBody IssueRequestDTO issue){
 
-        return service.getIssuesByUser(id);
+        return ResponseEntity.ok(
+                service.updateIssue(id, issue)
+        );
     }
 
-    @GetMapping("/paged")
-    public Page<Issue> getPagedIssues(@RequestParam int page, @RequestParam int size){
-        return service.getPagedIssues(page, size);
+    // DELETE ISSUE
+    @DeleteMapping("/issues/{id}")
+    public ResponseEntity<Void> deleteIssue(@PathVariable Long id) {
+        service.deleteIssue(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search")
-    public List<Issue> search(@RequestParam String keyword){
-        return service.searchIssues(keyword);
+    // DELETE ISSUE (PROJECT-SCOPED ROUTE)
+    @DeleteMapping("/projects/{projectId}/issues/{id}")
+    public ResponseEntity<Void> deleteIssueByProject(
+            @PathVariable Long projectId,
+            @PathVariable Long id) {
+        service.deleteIssue(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // PAGED
+    @GetMapping("/issues/paged")
+    public ResponseEntity<Page<IssueResponseDTO>> getPagedIssues(
+            @RequestParam int page,
+            @RequestParam int size){
+
+        return ResponseEntity.ok(
+                service.getPagedIssues(page, size)
+        );
+    }
+
+    // SEARCH
+    @GetMapping("/issues/search")
+    public ResponseEntity<List<IssueResponseDTO>> search(
+            @RequestParam String keyword){
+
+        return ResponseEntity.ok(
+                service.searchIssues(keyword)
+        );
     }
 }

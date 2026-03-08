@@ -3,11 +3,7 @@ package com.springchatgpt.issuetracker.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.springchatgpt.issuetracker.entity.Project;
 import com.springchatgpt.issuetracker.service.ProjectService;
@@ -22,17 +18,41 @@ public class ProjectController {
         this.projectService = projectService;
     }
 
+    // CREATE PROJECT
     @PostMapping
-    public ResponseEntity<Project> createProject(
-            @RequestBody Project project){
+    public ResponseEntity<Project> createProject(@RequestBody Project project){
+
+        Project created = projectService.create(project);
 
         return ResponseEntity
                 .status(201)
-                .body(projectService.create(project));
+                .body(created);
     }
 
+    // GET ALL PROJECTS
     @GetMapping
-    public List<Project> getProjects(){
-        return projectService.getAll();
+    public ResponseEntity<List<Project>> getProjects(){
+
+        return ResponseEntity.ok(
+                projectService.getAll()
+        );
+    }
+
+    // GET PROJECT BY ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Project> getProject(@PathVariable Long id){
+
+        return ResponseEntity.ok(
+                projectService.getById(id)
+        );
+    }
+
+    // DELETE PROJECT
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProject(@PathVariable Long id){
+
+        projectService.delete(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

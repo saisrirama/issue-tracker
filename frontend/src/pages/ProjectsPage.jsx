@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react"
-import { getProjects } from "../api/projectApi"
+import { getProjects, createProject, deleteProject } from "../api/projectApi"
 import ProjectCard from "../components/ProjectCard"
+import { useProjects } from "../hooks/useProjects"
+
 
 function ProjectsPage() {
 
-  const [projects, setProjects] = useState([])
-  const [loading, setLoading] = useState(true)
+const { projects, loading, setProjects } = useProjects()
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
+  const [setLoading] = useState(true)
 
   useEffect(() => {
     fetchProjects()
@@ -21,6 +25,38 @@ function ProjectsPage() {
       setLoading(false)
     }
   }
+  
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+
+    try {
+      const newProject = await createProject({
+        name,
+        description
+      })
+
+      setProjects([...projects, newProject])
+
+      setName("")
+      setDescription("")
+
+    } catch (error) {
+      console.error("Failed to create project")
+    }
+  }
+
+  const handleDelete = async (id) => {
+
+    try {
+      await deleteProject(id)
+
+      setProjects(projects.filter(p => p.id !== id))
+
+    } catch (error) {
+      console.error("Failed to delete project")
+    }
+  }
 
   if (loading) {
     return <p className="p-6">Loading projects...</p>
@@ -33,10 +69,47 @@ function ProjectsPage() {
         Projects
       </h1>
 
+      {/* Create Project Form */}
+
+      <form
+        onSubmit={handleCreate}
+        className="mb-6 flex gap-2"
+      >
+
+        <input
+          className="border p-2"
+          placeholder="Project Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <input
+          className="border p-2"
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+
+        <button className="bg-blue-500 text-white px-4">
+          Create
+        </button>
+
+      </form>
+
+      {/* Project List */}
+
+      {projects.length === 0 && (
+        <p>No projects found</p>
+      )}
+
       <div className="grid gap-4">
 
         {projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
+          <ProjectCard
+            key={project.id}
+            project={project}
+            onDelete={handleDelete}
+          />
         ))}
 
       </div>
