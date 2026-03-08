@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
+@RequestMapping("/api/v1")
 public class IssueController {
 
     private final IssueService service;
@@ -24,7 +26,7 @@ public class IssueController {
     public ResponseEntity<IssueResponseDTO> createIssue(
             @PathVariable Long projectId,
             @RequestParam(required = false) Long userId,
-            @RequestBody IssueRequestDTO issue){
+            @Valid @RequestBody IssueRequestDTO issue){
 
         Long resolvedUserId = userId != null ? userId : issue.getUserId();
 

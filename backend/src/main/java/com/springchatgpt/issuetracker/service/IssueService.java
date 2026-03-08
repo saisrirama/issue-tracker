@@ -5,6 +5,7 @@ import com.springchatgpt.issuetracker.dto.IssueResponseDTO;
 import com.springchatgpt.issuetracker.entity.Issue;
 import com.springchatgpt.issuetracker.entity.Project;
 import com.springchatgpt.issuetracker.entity.User;
+import com.springchatgpt.issuetracker.exception.ResourceNotFoundException;
 import com.springchatgpt.issuetracker.repository.IssueRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -94,7 +95,7 @@ public class IssueService {
 
     public IssueResponseDTO updateIssue(Long id, IssueRequestDTO request) {
         Issue issue = issueRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Issue not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Issue not found"));
 
         if (request.getTitle() != null && !request.getTitle().isBlank()) {
             issue.setTitle(request.getTitle());
@@ -122,7 +123,7 @@ public class IssueService {
 
     public void deleteIssue(Long id) {
         Issue issue = issueRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Issue not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Issue not found"));
         issueRepository.delete(issue);
     }
 

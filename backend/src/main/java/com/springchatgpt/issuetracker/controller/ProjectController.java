@@ -2,14 +2,16 @@ package com.springchatgpt.issuetracker.controller;
 
 import java.util.List;
 
+import com.springchatgpt.issuetracker.dto.ProjectRequestDTO;
+import com.springchatgpt.issuetracker.dto.ProjectResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.springchatgpt.issuetracker.entity.Project;
 import com.springchatgpt.issuetracker.service.ProjectService;
+import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/projects")
+@RequestMapping("/api/v1/projects")
 public class ProjectController {
 
     private final ProjectService projectService;
@@ -20,9 +22,9 @@ public class ProjectController {
 
     // CREATE PROJECT
     @PostMapping
-    public ResponseEntity<Project> createProject(@RequestBody Project project){
+    public ResponseEntity<ProjectResponseDTO> createProject(@Valid @RequestBody ProjectRequestDTO request){
 
-        Project created = projectService.create(project);
+        ProjectResponseDTO created = projectService.create(request);
 
         return ResponseEntity
                 .status(201)
@@ -31,7 +33,7 @@ public class ProjectController {
 
     // GET ALL PROJECTS
     @GetMapping
-    public ResponseEntity<List<Project>> getProjects(){
+    public ResponseEntity<List<ProjectResponseDTO>> getProjects(){
 
         return ResponseEntity.ok(
                 projectService.getAll()
@@ -40,10 +42,10 @@ public class ProjectController {
 
     // GET PROJECT BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProject(@PathVariable Long id){
+    public ResponseEntity<ProjectResponseDTO> getProject(@PathVariable Long id){
 
         return ResponseEntity.ok(
-                projectService.getById(id)
+                projectService.getProjectResponseById(id)
         );
     }
 

@@ -3,12 +3,14 @@ package com.springchatgpt.issuetracker.dto;
 public class ProjectResponseDTO {
     private Long id;
     private String name;
+    private String description;
 
     public ProjectResponseDTO() {}
 
-    public ProjectResponseDTO(Long id, String name) {
+    public ProjectResponseDTO(Long id, String name, String description) {
         this.id = id;
         this.name = name;
+        this.description = description;
     }
 
     public Long getId() {
@@ -25,5 +27,13 @@ public class ProjectResponseDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

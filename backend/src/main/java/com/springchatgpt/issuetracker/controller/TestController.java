@@ -8,7 +8,7 @@ import com.springchatgpt.issuetracker.dto.TestResponse;
 import com.springchatgpt.issuetracker.service.TestService;
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/api/v1/test")
 public class TestController {
 
     private final TestService testService;
