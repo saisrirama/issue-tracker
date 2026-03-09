@@ -26,6 +26,16 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST, "Validation failed", request, fieldErrors);
     }
 
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ApiError> handleDuplicateResourceException(DuplicateResourceException ex, HttpServletRequest request){
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiError> handleInvalidCredentialsException(InvalidCredentialsException ex, HttpServletRequest request){
+        return buildError(HttpStatus.UNAUTHORIZED, ex.getMessage(), request, null);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiError> handleRuntimeException(RuntimeException ex, HttpServletRequest request){
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request, null);
