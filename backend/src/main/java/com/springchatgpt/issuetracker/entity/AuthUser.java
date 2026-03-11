@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
@@ -16,9 +17,14 @@ public class AuthUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Username cannot be blank")
+    @NotBlank(message = "Name cannot be blank")
+    @Column(nullable = false)
+    private String name;
+
+    @NotBlank(message = "Email cannot be blank")
+    @Email(message = "Invalid email format")
     @Column(nullable = false, unique = true)
-    private String username;
+    private String email;
 
     @NotBlank(message = "Password cannot be blank")
     @Column(nullable = false)
@@ -26,8 +32,9 @@ public class AuthUser {
 
     public AuthUser() {}
 
-    public AuthUser(String username, String password) {
-        this.username = username;
+    public AuthUser(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
         this.password = password;
     }
 
@@ -39,12 +46,20 @@ public class AuthUser {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

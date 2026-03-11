@@ -1,50 +1,58 @@
 package com.springchatgpt.issuetracker.service;
 
-import org.springframework.stereotype.Service;
-
 import com.springchatgpt.issuetracker.dto.AuthUserResponseDTO;
 import com.springchatgpt.issuetracker.dto.LoginRequestDTO;
 import com.springchatgpt.issuetracker.dto.RegisterRequestDTO;
 import com.springchatgpt.issuetracker.entity.AuthUser;
 import com.springchatgpt.issuetracker.exception.DuplicateResourceException;
-import com.springchatgpt.issuetracker.exception.InvalidCredentialsException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import com.springchatgpt.issuetracker.repository.AuthUserRepository;
 
 @Service
 public class AuthService {
 
     private final AuthUserRepository authUserRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
-    public AuthService(AuthUserRepository authUserRepository) {
+    public AuthService(AuthUserRepository authUserRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
         this.authUserRepository = authUserRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
     }
 
     public AuthUserResponseDTO register(RegisterRequestDTO request) {
-        String normalizedUsername = request.getUsername().trim();
+        String normalizedEmail = request.getEmail().trim();
 
-        if (authUserRepository.existsByUsername(normalizedUsername)) {
-            throw new DuplicateResourceException("Username already exists");
+        if (authUserRepository.existsByEmail(normalizedEmail)) {
+            throw new DuplicateResourceException("Email already exists");
         }
 
         AuthUser user = new AuthUser();
-        user.setUsername(normalizedUsername);
-        user.setPassword(request.getPassword());
+        user.setName(request.getName().trim());
+        user.setEmail(normalizedEmail);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         return toResponse(authUserRepository.save(user));
     }
 
-    public AuthUserResponseDTO login(LoginRequestDTO request) {
-        AuthUser user = authUserRepository.findByUsername(request.getUsername().trim())
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password"));
+    public String login(LoginRequestDTO request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
 
-        if (!user.getPassword().equals(request.getPassword())) {
-            throw new InvalidCredentialsException("Invalid username or password");
-        }
-
-        return toResponse(user);
+        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return jwtUtil.generateToken(userDetails);
     }
 
     private AuthUserResponseDTO toResponse(AuthUser user) {
-        return new AuthUserResponseDTO(user.getId(), user.getUsername());
+        return new AuthUserResponseDTO(user.getId(), user.getName(), user.getEmail());
     }
 }

@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS auth_users (
     id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL
 );
 
@@ -23,6 +24,12 @@ CREATE TABLE IF NOT EXISTS issues (
     status VARCHAR(100),
     project_id BIGINT,
     assignee_id BIGINT,
+    feature VARCHAR(255),
+    priority VARCHAR(100),
+    due_date DATE,
+    time_estimate INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_issues_project
         FOREIGN KEY (project_id) REFERENCES projects(id),
     CONSTRAINT fk_issues_assignee

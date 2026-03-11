@@ -1,5 +1,8 @@
 package com.springchatgpt.issuetracker.dto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class IssueResponseDTO {
     private Long id;
     private String title;
@@ -9,6 +12,12 @@ public class IssueResponseDTO {
     private String projectName;
     private Long assigneeId;
     private String assigneeName;
+    private String feature;
+    private String priority;
+    private LocalDate dueDate;
+    private Integer timeEstimate;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Long getId() {
         return id;
@@ -57,5 +66,53 @@ public class IssueResponseDTO {
     }
     public void setAssigneeName(String assigneeName) {
         this.assigneeName = assigneeName;
+    }
+
+    public String getFeature() {
+        return feature;
+    }
+
+    public void setFeature(String feature) {
+        this.feature = feature;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Integer getTimeEstimate() {
+        return timeEstimate;
+    }
+
+    public void setTimeEstimate(Integer timeEstimate) {
+        this.timeEstimate = timeEstimate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

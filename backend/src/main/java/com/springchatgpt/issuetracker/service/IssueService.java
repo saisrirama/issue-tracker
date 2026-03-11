@@ -36,27 +36,34 @@ public class IssueService {
         this.userService = userService;
     }
 
-    public IssueResponseDTO createIssue(
-        IssueRequestDTO request,
-        Long projectId,
-        Long userId) {
+    public IssueResponseDTO createIssue(IssueRequestDTO request) {
 
-        log.info("Creating issue for projectId={}, userId={}, title={}", projectId, userId, request.getTitle());
-        Project project = projectService.getById(projectId);
-        User user = userId != null ? userService.getUserById(userId) : null;
+        log.info("Creating issue for projectId={}, userId={}, title={}", request.getProjectId(), request.getAssignedTo(), request.getTitle());
+        Project project = projectService.getById(request.getProjectId());
+        User user = request.getAssignedTo() != null ? userService.getUserById(request.getAssignedTo()) : null;
 
         Issue issue = new Issue();
         issue.setTitle(request.getTitle());
         issue.setDescription(request.getDescription());
-        issue.setStatus(request.getStatus() != null ? request.getStatus() : "OPEN");
+        issue.setStatus(request.getStatus() != null ? request.getStatus() : "To Do");
         issue.setProject(project);
         issue.setAssignee(user);
+        issue.setFeature(request.getFeature());
+        issue.setPriority(request.getPriority());
+        issue.setDueDate(request.getDueDate());
+        issue.setTimeEstimate(request.getTimeEstimate());
 
         Issue saved = issueRepository.save(issue);
         log.debug("Saved issue with id={}", saved.getId());
 
         log.info("Returning IssueResponseDTO for issue id={}", saved.getId());
         return toResponse(saved);
+    }
+
+    public IssueResponseDTO getIssueById(Long id) {
+        Issue issue = issueRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Issue not found"));
+        return toResponse(issue);
     }
 
     public List<IssueResponseDTO> getAllIssues(){
@@ -112,10 +119,27 @@ public class IssueService {
             issue.setProject(project);
         }
 
-        if (request.getUserId() != null) {
-            User user = userService.getUserById(request.getUserId());
+        if (request.getAssignedTo() != null) {
+            User user = userService.getUserById(request.getAssignedTo());
             issue.setAssignee(user);
         }
+        
+        if (request.getFeature() != null) {
+            issue.setFeature(request.getFeature());
+        }
+
+        if (request.getPriority() != null) {
+            issue.setPriority(request.getPriority());
+        }
+
+        if (request.getDueDate() != null) {
+            issue.setDueDate(request.getDueDate());
+        }
+
+        if (request.getTimeEstimate() != null) {
+            issue.setTimeEstimate(request.getTimeEstimate());
+        }
+
 
         Issue saved = issueRepository.save(issue);
         return toResponse(saved);
@@ -133,6 +157,12 @@ public class IssueService {
         response.setTitle(issue.getTitle());
         response.setDescription(issue.getDescription());
         response.setStatus(issue.getStatus() != null ? issue.getStatus() : "OPEN");
+        response.setFeature(issue.getFeature());
+        response.setPriority(issue.getPriority());
+        response.setDueDate(issue.getDueDate());
+        response.setTimeEstimate(issue.getTimeEstimate());
+        response.setCreatedAt(issue.getCreatedAt());
+        response.setUpdatedAt(issue.getUpdatedAt());
 
         Project project = issue.getProject();
         if (project != null) {

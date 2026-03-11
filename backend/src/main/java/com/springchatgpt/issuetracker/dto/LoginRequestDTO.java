@@ -1,27 +1,29 @@
 package com.springchatgpt.issuetracker.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequestDTO {
-    @NotBlank(message = "Username cannot be blank")
-    private String username;
+    @NotBlank(message = "Email cannot be blank")
+    @Email(message = "Invalid email format")
+    private String email;
 
     @NotBlank(message = "Password cannot be blank")
     private String password;
 
     public LoginRequestDTO() {}
 
-    public LoginRequestDTO(String username, String password) {
-        this.username = username;
+    public LoginRequestDTO(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

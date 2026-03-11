@@ -44,6 +44,14 @@ public class ProjectService {
         return toResponse(getById(id));
     }
 
+    // Update Project
+    public ProjectResponseDTO updateProject(Long id, ProjectRequestDTO request) {
+        Project project = getById(id);
+        project.setName(request.getName());
+        project.setDescription(request.getDescription());
+        return toResponse(projectRepository.save(project));
+    }
+
     // Delete Project
     public void delete(Long id){
         Project project = getById(id);

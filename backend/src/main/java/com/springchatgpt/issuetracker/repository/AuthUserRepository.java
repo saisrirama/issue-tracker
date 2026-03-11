@@ -9,6 +9,6 @@ import com.springchatgpt.issuetracker.entity.AuthUser;
 
 @Repository
 public interface AuthUserRepository extends JpaRepository<AuthUser, Long> {
-    boolean existsByUsername(String username);
-    Optional<AuthUser> findByUsername(String username);
+    boolean existsByEmail(String email);
+    Optional<AuthUser> findByEmail(String email);
 }

@@ -22,16 +22,12 @@ public class IssueController {
     }
 
     // CREATE ISSUE
-    @PostMapping("/projects/{projectId}/issues")
+    @PostMapping("/issues")
     public ResponseEntity<IssueResponseDTO> createIssue(
-            @PathVariable Long projectId,
-            @RequestParam(required = false) Long userId,
             @Valid @RequestBody IssueRequestDTO issue){
 
-        Long resolvedUserId = userId != null ? userId : issue.getUserId();
-
         IssueResponseDTO created =
-                service.createIssue(issue, projectId, resolvedUserId);
+                service.createIssue(issue);
 
         return ResponseEntity
                 .status(201)
@@ -54,6 +50,15 @@ public class IssueController {
 
         return ResponseEntity.ok(
                 service.getAllIssues()
+        );
+    }
+
+    // GET ISSUE BY ID
+    @GetMapping("/issues/{id}")
+    public ResponseEntity<IssueResponseDTO> getIssue(@PathVariable Long id){
+
+        return ResponseEntity.ok(
+                service.getIssueById(id)
         );
     }
 
