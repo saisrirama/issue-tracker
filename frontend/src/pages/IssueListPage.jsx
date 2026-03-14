@@ -4,6 +4,7 @@ import { useIssues } from '../hooks/useIssues';
 import { useProjects } from '../hooks/useProjects';
 import CreateIssueModal from '../components/CreateIssueModal';
 import EditIssueModal from '../components/EditIssueModal';
+import ViewIssueModal from '../components/ViewIssueModal';
 
 const IssueListPage = () => {
   const { issues, loading, error, setIssues } = useIssues();
@@ -13,6 +14,7 @@ const IssueListPage = () => {
   const [priorityFilter, setPriorityFilter] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [viewingIssue, setViewingIssue] = useState(null);
   const [editingIssue, setEditingIssue] = useState(null);
 
   const filteredAndSortedIssues = useMemo(() => {
@@ -179,6 +181,13 @@ const IssueListPage = () => {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
+                    onClick={() => setViewingIssue(issue)}
+                    className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    View
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setEditingIssue(issue)}
                     className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
                   >
@@ -202,6 +211,11 @@ const IssueListPage = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onCreated={(createdIssue) => setIssues((currentIssues) => [...currentIssues, createdIssue])}
+      />
+      <ViewIssueModal
+        isOpen={Boolean(viewingIssue)}
+        issue={viewingIssue}
+        onClose={() => setViewingIssue(null)}
       />
       <EditIssueModal
         isOpen={Boolean(editingIssue)}

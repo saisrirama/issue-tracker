@@ -7,5 +7,6 @@ import com.springchatgpt.issuetracker.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    
+    java.util.List<User> findByOwnerEmail(String email);
+    java.util.Optional<User> findByIdAndOwnerEmail(Long id, String email);
 }

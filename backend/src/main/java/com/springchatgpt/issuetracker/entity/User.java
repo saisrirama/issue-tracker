@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -22,6 +24,10 @@ public class User {
     @Email(message="Give the correct email ID")
     @NotBlank(message="Email cannot be blank")
     private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private AuthUser owner;
 
     public User(){}
 
@@ -49,5 +55,13 @@ public class User {
     }
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public AuthUser getOwner() {
+        return owner;
+    }
+
+    public void setOwner(AuthUser owner) {
+        this.owner = owner;
     }
 }

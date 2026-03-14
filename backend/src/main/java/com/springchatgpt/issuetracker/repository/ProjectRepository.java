@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProjectRepository
         extends JpaRepository<Project, Long> {
-
+    java.util.List<Project> findByOwnerEmail(String email);
+    java.util.Optional<Project> findByIdAndOwnerEmail(Long id, String email);
 }

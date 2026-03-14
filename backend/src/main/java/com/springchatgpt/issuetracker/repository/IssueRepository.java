@@ -17,13 +17,16 @@ public interface IssueRepository
         extends JpaRepository<Issue, Long> {
 
     List<Issue> findByProjectId(Long projectId);
+    List<Issue> findByProjectOwnerEmail(String email);
+    List<Issue> findByProjectIdAndProjectOwnerEmail(Long projectId, String email);
+    java.util.Optional<Issue> findByIdAndProjectOwnerEmail(Long id, String email);
 
     List<Issue> findByAssigneeId(Long userId);
 
-    Page<Issue> findAll(Pageable pageable);
+    Page<Issue> findByProjectOwnerEmail(String email, Pageable pageable);
 
-    @Query("SELECT i from Issue i WHERE i.title LIKE %:keyword%")
-    List<Issue> searchByTitle(@Param("keyword") String keyword);
+    @Query("SELECT i from Issue i WHERE i.project.owner.email = :email AND i.title LIKE %:keyword%")
+    List<Issue> searchByTitle(@Param("email") String email, @Param("keyword") String keyword);
 
 
 }

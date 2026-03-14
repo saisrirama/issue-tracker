@@ -2,6 +2,7 @@ package com.springchatgpt.issuetracker.service;
 
 import com.springchatgpt.issuetracker.dto.ProjectRequestDTO;
 import com.springchatgpt.issuetracker.dto.ProjectResponseDTO;
+import com.springchatgpt.issuetracker.entity.AuthUser;
 import com.springchatgpt.issuetracker.entity.Project;
 import com.springchatgpt.issuetracker.exception.ResourceNotFoundException;
 import com.springchatgpt.issuetracker.repository.ProjectRepository;
@@ -13,29 +14,33 @@ import java.util.List;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final AuthenticatedUserService authenticatedUserService;
 
-    public ProjectService(ProjectRepository projectRepository){
+    public ProjectService(ProjectRepository projectRepository, AuthenticatedUserService authenticatedUserService){
         this.projectRepository = projectRepository;
+        this.authenticatedUserService = authenticatedUserService;
     }
 
     // Create Project
     public ProjectResponseDTO create(ProjectRequestDTO request){
+        AuthUser currentUser = authenticatedUserService.getCurrentUser();
         Project project = new Project();
         project.setName(request.getName());
         project.setDescription(request.getDescription());
+        project.setOwner(currentUser);
         return toResponse(projectRepository.save(project));
     }
 
     // Get All Projects
     public List<ProjectResponseDTO> getAll(){
-        return projectRepository.findAll().stream()
+        return projectRepository.findByOwnerEmail(authenticatedUserService.getCurrentUserEmail()).stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     // Get Project By Id
     public Project getById(Long id){
-        return projectRepository.findById(id)
+        return projectRepository.findByIdAndOwnerEmail(id, authenticatedUserService.getCurrentUserEmail())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Project not found"));
     }

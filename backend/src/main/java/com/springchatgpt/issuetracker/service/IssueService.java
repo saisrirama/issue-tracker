@@ -25,15 +25,18 @@ public class IssueService {
     private final IssueRepository issueRepository;
     private final ProjectService projectService;
     private final UserService userService;
+    private final AuthenticatedUserService authenticatedUserService;
 
     public IssueService(
             IssueRepository issueRepository,
             ProjectService projectService,
-            UserService userService){
+            UserService userService,
+            AuthenticatedUserService authenticatedUserService){
 
         this.issueRepository = issueRepository;
         this.projectService = projectService;
         this.userService = userService;
+        this.authenticatedUserService = authenticatedUserService;
     }
 
     public IssueResponseDTO createIssue(IssueRequestDTO request) {
@@ -61,20 +64,20 @@ public class IssueService {
     }
 
     public IssueResponseDTO getIssueById(Long id) {
-        Issue issue = issueRepository.findById(id)
+        Issue issue = issueRepository.findByIdAndProjectOwnerEmail(id, authenticatedUserService.getCurrentUserEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Issue not found"));
         return toResponse(issue);
     }
 
     public List<IssueResponseDTO> getAllIssues(){
-        return issueRepository.findAll()
+        return issueRepository.findByProjectOwnerEmail(authenticatedUserService.getCurrentUserEmail())
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     public List<IssueResponseDTO> getIssuesByProject(Long id){
-        return issueRepository.findByProjectId(id)
+        return issueRepository.findByProjectIdAndProjectOwnerEmail(id, authenticatedUserService.getCurrentUserEmail())
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -89,19 +92,19 @@ public class IssueService {
 
     public Page<IssueResponseDTO> getPagedIssues(int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by("title"));
-        return issueRepository.findAll(pageable)
+        return issueRepository.findByProjectOwnerEmail(authenticatedUserService.getCurrentUserEmail(), pageable)
                 .map(this::toResponse);
     }
 
     public List<IssueResponseDTO> searchIssues(String keyword) {
-        return issueRepository.searchByTitle(keyword)
+        return issueRepository.searchByTitle(authenticatedUserService.getCurrentUserEmail(), keyword)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     public IssueResponseDTO updateIssue(Long id, IssueRequestDTO request) {
-        Issue issue = issueRepository.findById(id)
+        Issue issue = issueRepository.findByIdAndProjectOwnerEmail(id, authenticatedUserService.getCurrentUserEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Issue not found"));
 
         if (request.getTitle() != null && !request.getTitle().isBlank()) {
@@ -146,7 +149,7 @@ public class IssueService {
     }
 
     public void deleteIssue(Long id) {
-        Issue issue = issueRepository.findById(id)
+        Issue issue = issueRepository.findByIdAndProjectOwnerEmail(id, authenticatedUserService.getCurrentUserEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Issue not found"));
         issueRepository.delete(issue);
     }
