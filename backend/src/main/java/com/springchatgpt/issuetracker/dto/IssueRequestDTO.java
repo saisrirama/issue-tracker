@@ -1,6 +1,7 @@
 package com.springchatgpt.issuetracker.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public class IssueRequestDTO {
@@ -9,6 +10,7 @@ public class IssueRequestDTO {
     private String title;
     private String description;
     private String status;
+    @NotNull
     private Long projectId;
     private Long assignedTo;
     private String feature;

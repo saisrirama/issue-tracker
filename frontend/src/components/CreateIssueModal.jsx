@@ -1,17 +1,48 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useProjects } from '../hooks/useProjects';
 import { useUsers } from '../hooks/useUsers';
 import { createIssue } from '../api/issueApi';
 
-const CreateIssueModal = ({ isOpen, onClose }) => {
+const CreateIssueModal = ({ isOpen, onClose, initialProjectId = null, onCreated }) => {
   const {
     control,
     handleSubmit,
+    reset,
+    setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      title: '',
+      description: '',
+      projectId: '',
+      feature: '',
+      assignedTo: '',
+      priority: 'Medium',
+      dueDate: '',
+      timeEstimate: '',
+      status: 'To Do',
+    },
+  });
   const { projects, loading: projectsLoading } = useProjects();
   const { users, loading: usersLoading } = useUsers();
+  const [submitError, setSubmitError] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    if (initialProjectId) {
+      setValue('projectId', String(initialProjectId));
+    } else if (projects.length > 0) {
+      setValue('projectId', String(projects[0].id));
+    }
+
+    if (users.length > 0) {
+      setValue('assignedTo', String(users[0].id));
+    }
+  }, [initialProjectId, isOpen, projects, users, setValue]);
 
   if (!isOpen) {
     return null;
@@ -19,9 +50,20 @@ const CreateIssueModal = ({ isOpen, onClose }) => {
 
   const onSubmit = async (data) => {
     try {
-      await createIssue(data);
+      setSubmitError('');
+      const createdIssue = await createIssue({
+        ...data,
+        projectId: data.projectId ? Number(data.projectId) : null,
+        assignedTo: data.assignedTo ? Number(data.assignedTo) : null,
+        timeEstimate: data.timeEstimate ? Number(data.timeEstimate) : null,
+      });
+      onCreated?.(createdIssue);
+      reset();
       onClose();
     } catch (error) {
+      setSubmitError(
+        error.response?.data?.message ?? 'Failed to create issue. Check your input and try again.'
+      );
       console.error('Failed to create issue:', error);
     }
   };
@@ -31,6 +73,11 @@ const CreateIssueModal = ({ isOpen, onClose }) => {
       <div className="bg-white p-8 rounded-lg w-full max-w-2xl">
         <h2 className="text-2xl font-bold mb-4">Create Issue</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
+          {submitError && (
+            <p className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              {submitError}
+            </p>
+          )}
           <div className="mb-4">
             <label htmlFor="title" className="block text-gray-700">Issue Name</label>
             <Controller
@@ -60,6 +107,7 @@ const CreateIssueModal = ({ isOpen, onClose }) => {
                 rules={{ required: 'Project is required' }}
                 render={({ field }) => (
                   <select {...field} id="projectId" className="w-full p-2 border rounded" disabled={projectsLoading}>
+                    {projects.length === 0 && <option value="">No projects available</option>}
                     {projects.map((project) => (
                       <option key={project.id} value={project.id}>
                         {project.name}
@@ -88,6 +136,7 @@ const CreateIssueModal = ({ isOpen, onClose }) => {
                 control={control}
                 render={({ field }) => (
                   <select {...field} id="assignedTo" className="w-full p-2 border rounded" disabled={usersLoading}>
+                    <option value="">Unassigned</option>
                     {users.map((user) => (
                       <option key={user.id} value={user.id}>
                         {user.name}

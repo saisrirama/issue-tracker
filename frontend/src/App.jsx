@@ -19,86 +19,92 @@ import { useAuth } from "./context/AuthContext";
 function App() {
   const location = useLocation();
   const { user } = useAuth();
-  const showNavbar = ["/home", "/login", "/register"].includes(location.pathname) || !user;
+
+  // Hide standard Navbar on landing page as it has its own
+  const isLandingPage = location.pathname === "/home" || location.pathname === "/";
+  const showNavbar = !isLandingPage && (["/login", "/register"].includes(location.pathname) || !user);
 
   return (
-    <div className="flex">
+    <div className="min-h-screen flex flex-col bg-slate-50">
       {showNavbar && <Navbar />}
-      {!showNavbar && (
-        <ProtectedRoute>
-          <Sidebar />
-        </ProtectedRoute>
-      )}
 
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Navigate to="/home" />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+      <div className="flex flex-grow">
+        {!showNavbar && !isLandingPage && (
+          <ProtectedRoute>
+            <Sidebar />
+          </ProtectedRoute>
+        )}
 
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage>
-                  <ProjectsPage />
-                </DashboardPage>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/projects"
-            element={
-              <ProtectedRoute>
-                <DashboardPage>
-                  <ProjectsPage />
-                </DashboardPage>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/projects/:projectId"
-            element={
-              <ProtectedRoute>
-                <DashboardPage>
-                  <ProjectDetailsPage />
-                </DashboardPage>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/issues"
-            element={
-              <ProtectedRoute>
-                <DashboardPage>
-                  <IssueListPage />
-                </DashboardPage>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/issues/:issueId"
-            element={
-              <ProtectedRoute>
-                <DashboardPage>
-                  <IssueDetailsPage />
-                </DashboardPage>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/my-issues"
-            element={
-              <ProtectedRoute>
-                <DashboardPage>
-                  <MyIssuesPage />
-                </DashboardPage>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </main>
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage>
+                    <ProjectsPage />
+                  </DashboardPage>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/projects"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage>
+                    <ProjectsPage />
+                  </DashboardPage>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/projects/:projectId"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage>
+                    <ProjectDetailsPage />
+                  </DashboardPage>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/issues"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage>
+                    <IssueListPage />
+                  </DashboardPage>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/issues/:issueId"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage>
+                    <IssueDetailsPage />
+                  </DashboardPage>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-issues"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage>
+                    <MyIssuesPage />
+                  </DashboardPage>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </main>
+      </div>
     </div>
   );
 }
