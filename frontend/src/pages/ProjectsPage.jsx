@@ -1,20 +1,18 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useProjects } from "../hooks/useProjects";
 import { createProject, deleteProject, updateProject } from "../api/projectApi";
-import ProjectCard from "../components/ProjectCard";
+import CreateProjectModal from "../components/CreateProjectModal";
 import EditProjectModal from "../components/EditProjectModal";
 
 function ProjectsPage() {
   const { projects, loading, setProjects } = useProjects();
-  const { register, handleSubmit, reset } = useForm();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
 
   const handleCreate = async (data) => {
     try {
       const newProject = await createProject(data);
       setProjects([...projects, newProject]);
-      reset();
     } catch (error) {
       console.error("Failed to create project", error);
     }
@@ -50,39 +48,62 @@ function ProjectsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Projects</h1>
-
-      {/* Create Project Form */}
-      <form onSubmit={handleSubmit(handleCreate)} className="mb-6 flex gap-2">
-        <input
-          {...register("name", { required: true })}
-          className="border p-2"
-          placeholder="Project Name"
-        />
-        <input
-          {...register("description")}
-          className="border p-2"
-          placeholder="Description"
-        />
-        <button type="submit" className="bg-blue-500 text-white px-4">
-          Create
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold">Projects</h1>
+        <button
+          type="button"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+        >
+          Create Project
         </button>
-      </form>
-
-      {/* Project List */}
-      {projects.length === 0 && <p>No projects found</p>}
-
-      <div className="grid gap-4">
-        {projects.map((project) => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
-          />
-        ))}
       </div>
 
+      {projects.length === 0 ? (
+        <p>No projects found</p>
+      ) : (
+        <table className="w-full table-auto border-collapse">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="p-2 border text-left">Name</th>
+              <th className="p-2 border text-left">Description</th>
+              <th className="w-px whitespace-nowrap p-2 border text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {projects.map((project) => (
+              <tr key={project.id}>
+                <td className="p-2 border">{project.name}</td>
+                <td className="p-2 border">{project.description || "No description provided."}</td>
+                <td className="w-px whitespace-nowrap p-2 border">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleEdit(project)}
+                      className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(project.id)}
+                      className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      <CreateProjectModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreate={handleCreate}
+      />
       {editingProject && (
         <EditProjectModal
           isOpen={!!editingProject}

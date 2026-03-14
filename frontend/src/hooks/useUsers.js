@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllUsers } from '../api/userApi'; // This file does not exist yet
+import { getAllUsers } from '../api/userApi';
 
 export const useUsers = () => {
   const [users, setUsers] = useState([]);
@@ -21,5 +21,5 @@ export const useUsers = () => {
     fetchUsers();
   }, []);
 
-  return { users, loading, error };
+  return { users, loading, error, setUsers };
 };

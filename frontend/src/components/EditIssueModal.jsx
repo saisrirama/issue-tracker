@@ -4,6 +4,8 @@ import { updateIssue } from "../api/issueApi";
 import { useProjects } from "../hooks/useProjects";
 import { useUsers } from "../hooks/useUsers";
 
+const getUserLabel = (user) => user.name || user.email || `User #${user.id}`;
+
 const EditIssueModal = ({ isOpen, issue, onClose, onUpdated }) => {
   const {
     control,
@@ -180,13 +182,15 @@ const EditIssueModal = ({ isOpen, issue, onClose, onUpdated }) => {
                   <select
                     {...field}
                     id="edit-assignee"
-                    className="w-full rounded-xl border border-slate-200 p-3"
+                    className="w-full rounded-xl border border-slate-200 p-3 text-slate-900"
                     disabled={usersLoading}
                   >
                     <option value="">Unassigned</option>
+                    {usersLoading && <option value="">Loading users...</option>}
+                    {!usersLoading && users.length === 0 && <option value="">No users available</option>}
                     {users.map((user) => (
                       <option key={user.id} value={user.id}>
-                        {user.name}
+                        {getUserLabel(user)}
                       </option>
                     ))}
                   </select>

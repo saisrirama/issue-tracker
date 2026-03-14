@@ -4,7 +4,11 @@ import { AuthContext } from "../context/AuthContext"
 
 function ProtectedRoute({ children }) {
 
-  const { user } = useContext(AuthContext)
+  const { user, isAuthLoading } = useContext(AuthContext)
+
+  if (isAuthLoading) {
+    return <div className="p-6">Loading...</div>
+  }
 
   if (!user) {
     return <Navigate to="/login" />

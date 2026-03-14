@@ -1,33 +1,38 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 
 function ProjectCard({ project, onDelete, onEdit }) {
-  const navigate = useNavigate();
+  const showActions = Boolean(onDelete || onEdit);
 
   return (
-    <div className="border p-4 rounded shadow flex justify-between">
-      <div
-        className="cursor-pointer"
-        onClick={() => navigate(`/projects/${project.id}`)}
-      >
-        <h2 className="font-semibold">{project.name}</h2>
-        <p className="text-gray-600">{project.description}</p>
+    <div className="group flex justify-between gap-4 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Project</p>
+        <h2 className="mt-3 text-xl font-semibold text-slate-900">{project.name}</h2>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
+          {project.description || "No description provided."}
+        </p>
       </div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={() => onEdit(project)}
-          className="bg-yellow-500 text-white px-3 py-1 rounded"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => onDelete(project.id)}
-          className="bg-red-500 text-white px-3 py-1 rounded"
-        >
-          Delete
-        </button>
-      </div>
+      {showActions && (
+        <div className="flex flex-col justify-between gap-3">
+          {onEdit && (
+            <button
+              onClick={() => onEdit(project)}
+              className="rounded-2xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-600"
+            >
+              Edit
+            </button>
+          )}
+          {onDelete && (
+            <button
+              onClick={() => onDelete(project.id)}
+              className="rounded-2xl bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
+            >
+              Delete
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

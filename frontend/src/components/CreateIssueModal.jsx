@@ -4,6 +4,8 @@ import { useProjects } from '../hooks/useProjects';
 import { useUsers } from '../hooks/useUsers';
 import { createIssue } from '../api/issueApi';
 
+const getUserLabel = (user) => user.name || user.email || `User #${user.id}`;
+
 const CreateIssueModal = ({ isOpen, onClose, initialProjectId = null, onCreated }) => {
   const {
     control,
@@ -135,11 +137,18 @@ const CreateIssueModal = ({ isOpen, onClose, initialProjectId = null, onCreated 
                 name="assignedTo"
                 control={control}
                 render={({ field }) => (
-                  <select {...field} id="assignedTo" className="w-full p-2 border rounded" disabled={usersLoading}>
+                  <select
+                    {...field}
+                    id="assignedTo"
+                    className="w-full rounded border p-2 text-slate-900"
+                    disabled={usersLoading}
+                  >
                     <option value="">Unassigned</option>
+                    {usersLoading && <option value="">Loading users...</option>}
+                    {!usersLoading && users.length === 0 && <option value="">No users available</option>}
                     {users.map((user) => (
                       <option key={user.id} value={user.id}>
-                        {user.name}
+                        {getUserLabel(user)}
                       </option>
                     ))}
                   </select>

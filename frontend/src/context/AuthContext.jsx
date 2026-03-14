@@ -14,12 +14,21 @@ export const useAuth = () => {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      const decodedUser = jwtDecode(token);
-      setUser({ ...decodedUser, name: decodedUser.sub });
+    try {
+      if (token) {
+        const decodedUser = jwtDecode(token);
+        setUser({ ...decodedUser, name: decodedUser.sub });
+      }
+    } catch (error) {
+      console.error("Failed to restore auth session", error);
+      localStorage.removeItem("token");
+      localStorage.removeItem("auth_user");
+    } finally {
+      setIsAuthLoading(false);
     }
   }, []);
 
@@ -43,9 +52,8 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, isAuthLoading, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
-

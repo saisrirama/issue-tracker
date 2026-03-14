@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useState } from "react";
 
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
@@ -10,7 +11,7 @@ import ProjectsPage from "./pages/ProjectsPage";
 import ProjectDetailsPage from "./pages/ProjectDetailsPage";
 import IssueListPage from "./pages/IssueListPage";
 import IssueDetailsPage from "./pages/IssueDetailsPage";
-import MyIssuesPage from "./pages/MyIssuesPage";
+import UsersPage from "./pages/UsersPage";
 import DashboardPage from "./pages/DashboardPage";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -19,23 +20,33 @@ import { useAuth } from "./context/AuthContext";
 function App() {
   const location = useLocation();
   const { user } = useAuth();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Hide standard Navbar on landing page as it has its own
   const isLandingPage = location.pathname === "/home" || location.pathname === "/";
   const showNavbar = !isLandingPage && (["/login", "/register"].includes(location.pathname) || !user);
+  const showSidebar = !showNavbar && !isLandingPage;
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
       {showNavbar && <Navbar />}
 
       <div className="flex flex-grow">
-        {!showNavbar && !isLandingPage && (
+        {showSidebar && (
           <ProtectedRoute>
-            <Sidebar />
+            <Sidebar
+              isOpen={isSidebarOpen}
+              onToggle={() => setIsSidebarOpen((current) => !current)}
+              onClose={() => setIsSidebarOpen(false)}
+            />
           </ProtectedRoute>
         )}
 
-        <main className="flex-grow">
+        <main
+          className={`flex-grow transition-[margin] duration-300 ${
+            showSidebar && isSidebarOpen ? "lg:ml-72" : "ml-0"
+          }`}
+        >
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/home" element={<HomePage />} />
@@ -46,9 +57,7 @@ function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <DashboardPage>
-                    <ProjectsPage />
-                  </DashboardPage>
+                  <DashboardPage />
                 </ProtectedRoute>
               }
             />
@@ -93,11 +102,11 @@ function App() {
               }
             />
             <Route
-              path="/my-issues"
+              path="/users"
               element={
                 <ProtectedRoute>
                   <DashboardPage>
-                    <MyIssuesPage />
+                    <UsersPage />
                   </DashboardPage>
                 </ProtectedRoute>
               }

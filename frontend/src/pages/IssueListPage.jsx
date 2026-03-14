@@ -1,14 +1,19 @@
 import React, { useState, useMemo } from 'react';
+import { deleteIssue } from '../api/issueApi';
 import { useIssues } from '../hooks/useIssues';
 import { useProjects } from '../hooks/useProjects';
+import CreateIssueModal from '../components/CreateIssueModal';
+import EditIssueModal from '../components/EditIssueModal';
 
 const IssueListPage = () => {
-  const { issues, loading, error } = useIssues();
+  const { issues, loading, error, setIssues } = useIssues();
   const { projects, loading: projectsLoading } = useProjects();
   const [projectFilter, setProjectFilter] = useState('');
   const [featureFilter, setFeatureFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingIssue, setEditingIssue] = useState(null);
 
   const filteredAndSortedIssues = useMemo(() => {
     let filteredIssues = [...issues];
@@ -50,6 +55,24 @@ const IssueListPage = () => {
     setSortConfig({ key, direction });
   };
 
+  const handleIssueUpdated = (updatedIssue) => {
+    setIssues((currentIssues) =>
+      currentIssues.map((issue) => (issue.id === updatedIssue.id ? updatedIssue : issue))
+    );
+  };
+
+  const handleIssueDeleted = async (issueId) => {
+    try {
+      await deleteIssue(issueId);
+      setIssues((currentIssues) => currentIssues.filter((issue) => issue.id !== issueId));
+      if (editingIssue?.id === issueId) {
+        setEditingIssue(null);
+      }
+    } catch (deleteError) {
+      console.error('Failed to delete issue', deleteError);
+    }
+  };
+
   if (loading || projectsLoading) {
     return <div>Loading...</div>;
   }
@@ -60,7 +83,16 @@ const IssueListPage = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Issues</h1>
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold">Issues</h1>
+        <button
+          type="button"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+        >
+          Create Issue
+        </button>
+      </div>
 
       <div className="flex justify-between mb-4">
         <div className="flex space-x-4">
@@ -120,7 +152,7 @@ const IssueListPage = () => {
         </div>
       </div>
 
-      <table className="w-full border-collapse">
+      <table className="w-full table-auto border-collapse">
         <thead>
           <tr className="bg-gray-200">
             <th className="p-2 border">Title</th>
@@ -130,6 +162,7 @@ const IssueListPage = () => {
             <th className="p-2 border">Status</th>
             <th className="p-2 border">Due Date</th>
             <th className="p-2 border">Assignee</th>
+            <th className="w-px whitespace-nowrap p-2 border">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -142,10 +175,40 @@ const IssueListPage = () => {
               <td className="p-2 border">{issue.status}</td>
               <td className="p-2 border">{issue.dueDate}</td>
               <td className="p-2 border">{issue.assigneeName}</td>
+              <td className="w-px whitespace-nowrap p-2 border">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingIssue(issue)}
+                    className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleIssueDeleted(issue.id)}
+                    className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <CreateIssueModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreated={(createdIssue) => setIssues((currentIssues) => [...currentIssues, createdIssue])}
+      />
+      <EditIssueModal
+        isOpen={Boolean(editingIssue)}
+        issue={editingIssue}
+        onClose={() => setEditingIssue(null)}
+        onUpdated={handleIssueUpdated}
+      />
     </div>
   );
 };
