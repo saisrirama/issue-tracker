@@ -82,18 +82,21 @@ const HomePage = () => {
               title="Create a Project"
               description="Set up your workspace in seconds. Define your project scope and invite your team members."
               align="left"
+              variant="project"
             />
             <Step 
               number="02"
               title="Add Issues"
               description="Quickly capture bugs, feature requests, or tasks. Assign priorities and add descriptive tags."
               align="right"
+              variant="issues"
             />
             <Step 
               number="03"
               title="Track Progress"
               description="Monitor resolution times and project health with our intuitive spreadsheet-like table interface."
               align="left"
+              variant="progress"
             />
           </div>
         </div>
@@ -106,13 +109,6 @@ const HomePage = () => {
           <p className="text-2xl md:text-3xl font-medium mb-8 leading-relaxed italic">
             "Finally a simple issue tracker that doesn't feel bloated. It focuses on speed and clarity, making it a joy to use everyday."
           </p>
-          <div className="flex items-center justify-center space-x-4">
-            <div className="w-12 h-12 bg-slate-700 rounded-full border-2 border-indigo-400"></div>
-            <div className="text-left">
-              <div className="font-bold">Alex Rivera</div>
-              <div className="text-indigo-300 text-sm">Lead Engineer @ TechFlow</div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -126,9 +122,7 @@ const HomePage = () => {
             <span className="font-bold text-slate-900">IssueTracker</span>
           </div>
           <div className="flex space-x-8 text-sm font-medium text-slate-500">
-            <a href="#" className="hover:text-indigo-600 transition-colors">GitHub</a>
-            <a href="#" className="hover:text-indigo-600 transition-colors">About</a>
-            <a href="#" className="hover:text-indigo-600 transition-colors">Contact</a>
+            <a href="https://github.com/saisrirama" className="hover:text-indigo-600 transition-colors">My GitHub</a>
           </div>
           <p className="text-xs text-slate-400">© 2026 IssueTracker Inc. All rights reserved.</p>
         </div>
@@ -145,7 +139,7 @@ const FeatureCard = ({ icon, title, description }) => (
   </div>
 );
 
-const Step = ({ number, title, description, align }) => (
+const Step = ({ number, title, description, align, variant }) => (
   <div className={`flex flex-col md:flex-row items-center ${align === 'right' ? 'md:flex-row-reverse' : ''} gap-12`}>
     <div className="flex-1">
       <div className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-2xl font-bold text-indigo-600 mb-6 border border-slate-100">
@@ -154,19 +148,125 @@ const Step = ({ number, title, description, align }) => (
       <h3 className="text-3xl font-bold mb-4">{title}</h3>
       <p className="text-lg text-slate-600 leading-relaxed max-w-md">{description}</p>
     </div>
-    <div className="flex-1 w-full aspect-video bg-white rounded-3xl shadow-2xl shadow-indigo-100 border border-slate-100 p-4 transition-transform hover:scale-[1.02]">
-      <div className="w-full h-full bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 font-mono text-sm overflow-hidden">
-        {/* Placeholder for screenshot - logic would be to use real screenshots later */}
-        <div className="p-8 space-y-4 w-full">
-           <div className="h-4 w-1/3 bg-slate-200 rounded animate-pulse"></div>
-           <div className="h-20 w-full bg-slate-100 rounded border border-slate-200 p-4 space-y-2">
-              <div className="h-2 w-3/4 bg-slate-200 rounded"></div>
-              <div className="h-2 w-1/2 bg-slate-200 rounded"></div>
-           </div>
-           <div className="h-20 w-full bg-white rounded border border-indigo-100 p-4 space-y-2 shadow-sm">
-              <div className="h-2 w-full bg-indigo-50 rounded"></div>
-              <div className="h-2 w-2/3 bg-indigo-50 rounded"></div>
-           </div>
+    <div className="flex-1 w-full">
+      <SampleImage variant={variant} />
+    </div>
+  </div>
+);
+
+const SampleImage = ({ variant }) => (
+  <div className="relative aspect-video overflow-hidden rounded-3xl border border-slate-100 bg-white p-4 shadow-2xl shadow-indigo-100 transition-transform hover:scale-[1.02]">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(99,102,241,0.10),_transparent_35%)]" />
+    <div className="relative h-full rounded-2xl border border-slate-100 bg-slate-50 p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="h-3 w-3 rounded-full bg-rose-300" />
+          <span className="h-3 w-3 rounded-full bg-amber-300" />
+          <span className="h-3 w-3 rounded-full bg-emerald-300" />
+        </div>
+        <div className="h-3 w-24 rounded-full bg-slate-200" />
+      </div>
+      {variant === "project" && <ProjectMock />}
+      {variant === "issues" && <IssueMock />}
+      {variant === "progress" && <ProgressMock />}
+    </div>
+  </div>
+);
+
+const ProjectMock = () => (
+  <div className="space-y-4">
+    <div className="flex items-center justify-between">
+      <div>
+        <div className="h-3 w-28 rounded-full bg-slate-300" />
+        <div className="mt-2 h-2 w-40 rounded-full bg-slate-200" />
+      </div>
+      <div className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white">Create</div>
+    </div>
+    <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="h-10 rounded-xl border border-slate-200 bg-slate-50" />
+      <div className="h-10 rounded-xl border border-slate-200 bg-slate-50" />
+      <div className="flex justify-end">
+        <div className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-semibold text-white">Saved</div>
+      </div>
+    </div>
+  </div>
+);
+
+const IssueMock = () => (
+  <div className="space-y-4">
+    <div className="flex items-center justify-between">
+      <div>
+        <div className="h-3 w-24 rounded-full bg-slate-300" />
+        <div className="mt-2 h-2 w-32 rounded-full bg-slate-200" />
+      </div>
+      <div className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white">New Issue</div>
+    </div>
+    <div className="grid grid-cols-[1.8fr_1fr_1fr_1fr] gap-3 rounded-2xl bg-slate-200 px-4 py-3">
+      <div className="h-3 rounded-full bg-slate-300" />
+      <div className="h-3 rounded-full bg-slate-300" />
+      <div className="h-3 rounded-full bg-slate-300" />
+      <div className="h-3 rounded-full bg-slate-300" />
+    </div>
+    {[0, 1, 2].map((row) => (
+      <div key={row} className="grid grid-cols-[1.8fr_1fr_1fr_1fr] gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
+        <div className="space-y-2">
+          <div className="h-3 w-4/5 rounded-full bg-slate-200" />
+          <div className="h-2 w-2/3 rounded-full bg-slate-100" />
+        </div>
+        <div className="flex items-center">
+          <div className={`h-6 w-20 rounded-full ${row === 0 ? 'bg-rose-100' : row === 1 ? 'bg-amber-100' : 'bg-emerald-100'}`} />
+        </div>
+        <div className="flex items-center">
+          <div className={`h-6 w-16 rounded-full ${row === 0 ? 'bg-indigo-100' : row === 1 ? 'bg-sky-100' : 'bg-slate-100'}`} />
+        </div>
+        <div className="flex items-center">
+          <div className="h-3 w-14 rounded-full bg-slate-200" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+const ProgressMock = () => (
+  <div className="space-y-4">
+    <div className="flex items-center justify-between">
+      <div>
+        <div className="h-3 w-28 rounded-full bg-slate-300" />
+        <div className="mt-2 h-2 w-36 rounded-full bg-slate-200" />
+      </div>
+      <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500">
+        This week
+      </div>
+    </div>
+    <div className="grid grid-cols-3 gap-3">
+      {[0, 1, 2].map((card) => (
+        <div key={card} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="h-2 w-12 rounded-full bg-slate-200" />
+          <div className={`mt-3 h-7 w-12 rounded-full ${card === 0 ? 'bg-indigo-100' : card === 1 ? 'bg-emerald-100' : 'bg-amber-100'}`} />
+          <div className="mt-3 h-2 w-16 rounded-full bg-slate-100" />
+        </div>
+      ))}
+    </div>
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="h-3 w-32 rounded-full bg-slate-200" />
+        <div className="h-2 w-14 rounded-full bg-slate-100" />
+      </div>
+      <div className="space-y-3">
+        <div>
+          <div className="mb-2 h-2 w-20 rounded-full bg-slate-200" />
+          <div className="h-3 w-full rounded-full bg-slate-100" />
+          <div className="-mt-3 h-3 w-4/5 rounded-full bg-indigo-200" />
+        </div>
+        <div>
+          <div className="mb-2 h-2 w-24 rounded-full bg-slate-200" />
+          <div className="h-3 w-full rounded-full bg-slate-100" />
+          <div className="-mt-3 h-3 w-2/3 rounded-full bg-emerald-200" />
+        </div>
+        <div>
+          <div className="mb-2 h-2 w-16 rounded-full bg-slate-200" />
+          <div className="h-3 w-full rounded-full bg-slate-100" />
+          <div className="-mt-3 h-3 w-1/2 rounded-full bg-amber-200" />
         </div>
       </div>
     </div>
