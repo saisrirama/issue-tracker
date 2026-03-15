@@ -105,7 +105,6 @@ const HomePage = () => {
       {/* Testimonial Section */}
       <section className="py-24 bg-indigo-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="text-indigo-400 text-5xl mb-8">"</div>
           <p className="text-2xl md:text-3xl font-medium mb-8 leading-relaxed italic">
             "Finally a simple issue tracker that doesn't feel bloated. It focuses on speed and clarity, making it a joy to use everyday."
           </p>
