@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/javascript">
+      (function () {
+        const redirect = sessionStorage.redirect;
+        if (redirect) {
+          delete sessionStorage.redirect;
+          const normalized = redirect.replace("/issue-tracker", "");
+          window.history.replaceState(null, "", normalized);
+        }
+      })();
+    </script>
+    <title>IssueTracker</title>
+    <script type="module" crossorigin src="/issue-tracker/assets/index-BYr4sz9Y.js"></script>
+    <link rel="stylesheet" crossorigin href="/issue-tracker/assets/index-DmmfDr1b.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
