@@ -7,20 +7,20 @@ import com.springchatgpt.issuetracker.entity.Project;
 import com.springchatgpt.issuetracker.entity.User;
 import com.springchatgpt.issuetracker.exception.ResourceNotFoundException;
 import com.springchatgpt.issuetracker.repository.IssueRepository;
-
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-@Slf4j
 @Service
 public class IssueService {
+
+    private static final Logger log = LoggerFactory.getLogger(IssueService.class);
 
     private final IssueRepository issueRepository;
     private final ProjectService projectService;
