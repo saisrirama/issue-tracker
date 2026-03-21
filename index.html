@@ -4,8 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IssueTracker</title>
-    <script type="module" crossorigin src="/assets/index-a0qq6LRr.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DmmfDr1b.css">
+    <script type="text/javascript">
+      (function () {
+        const redirect = sessionStorage.redirect;
+        if (redirect) {
+          delete sessionStorage.redirect;
+          const normalized = redirect.replace("/issue-tracker", "");
+          window.history.replaceState(null, "", normalized);
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/issue-tracker/assets/index-CTEbpN7M.js"></script>
+    <link rel="stylesheet" crossorigin href="/issue-tracker/assets/index-DmmfDr1b.css">
   </head>
   <body>
     <div id="root"></div>
