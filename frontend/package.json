@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://saisrirama.github.io/issue-tracker",
+  "homepage": "https://issue-tracker-0z0r.onrender.com",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
