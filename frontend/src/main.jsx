@@ -6,6 +6,13 @@ import { AuthProvider } from "./context/AuthContext"
 import App from "./App.jsx"
 import "./index.css"
 
+const params = new URLSearchParams(window.location.search);
+const redirect = params.get("redirect");
+
+if (redirect) {
+  window.history.replaceState(null, "", redirect);
+}
+
 const basename =
   import.meta.env.BASE_URL && import.meta.env.BASE_URL !== "/"
     ? import.meta.env.BASE_URL.replace(/\/$/, "")

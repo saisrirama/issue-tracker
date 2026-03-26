@@ -17,6 +17,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 
+
 function App() {
   const location = useLocation();
   const { user } = useAuth();
@@ -26,6 +27,13 @@ function App() {
   const isLandingPage = location.pathname === "/home" || location.pathname === "/";
   const showNavbar = !isLandingPage && (["/login", "/register"].includes(location.pathname) || !user);
   const showSidebar = !showNavbar && !isLandingPage;
+
+  const params = new URLSearchParams(window.location.search);
+const redirect = params.get("redirect");
+
+if (redirect) {
+  window.history.replaceState(null, "", redirect);
+}
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
