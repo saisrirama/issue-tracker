@@ -1,5 +1,5 @@
 import axios from "axios";
-
+console.log("ENV URL:", import.meta.env.VITE_API_BASE_URL);
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
 console.log("ENV URL:", import.meta.env.VITE_API_BASE_URL);
 const api = axios.create({
